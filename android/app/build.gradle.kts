@@ -8,8 +8,7 @@ plugins {
 android {
     namespace = "com.example.sfe_mobile"
     compileSdk = 34
-    ndkVersion = flutter.ndkVersion
-
+    ndkVersion = "26.3.11579264" 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
