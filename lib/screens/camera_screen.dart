@@ -24,6 +24,15 @@ class _CameraScreenState extends State<CameraScreen> {
     final pickedFile = await picker.pickImage(source: source);
 
     if (pickedFile != null) {
+      // DEBUG: Inspect the file
+      final file = File(pickedFile.path);
+      print('=== CAMERA FILE DEBUG ===');
+      print('Path: ${pickedFile.path}');
+      print('Name: ${pickedFile.name}');
+      print('Exists: ${await file.exists()}');
+      print('Size: ${await file.length()} bytes');
+      print('=========================');
+
       setState(() {
         _selectedImage = File(pickedFile.path);
       });
@@ -35,6 +44,11 @@ class _CameraScreenState extends State<CameraScreen> {
     if (_selectedImage == null) return;
 
     setState(() => _isLoading = true);
+    // Before creating the request
+    print('=== SENDING FILE ===');
+    print('Path: ${_selectedImage!.path}');
+    print('Exists: ${await _selectedImage!.exists()}');
+    print('Size: ${await _selectedImage!.length()}');
 
     final result = await _apiService.identifyPlant(_selectedImage!);
 
