@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../utils/constants.dart';
 import '../models/plant.dart';
 import 'auth_service.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ApiService {
   final AuthService _authService = AuthService();
@@ -23,7 +24,11 @@ class ApiService {
       );
 
       request.headers['Authorization'] = 'Bearer $token';
-      request.files.add(await http.MultipartFile.fromPath('image', image.path));
+      request.files.add(await http.MultipartFile.fromPath(
+        'image',
+        image.path,
+        contentType: MediaType('image', 'jpeg'), // FORCE the correct MIME type
+      ));
 
       final response = await request.send();
       final responseData = await response.stream.bytesToString();
