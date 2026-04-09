@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../models/plant.dart';
+import '../services/gbif_service.dart';
 import 'history_screen.dart';
 import 'plant_map_screen.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final Plant plant;
   final File photo;
   final String identificationId;
@@ -17,6 +18,28 @@ class ResultScreen extends StatelessWidget {
   });
 
   @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  int _occurrenceCount = 0;
+  bool _isLoadingCount = true;
+  @override
+  void initState() {
+    super.initState();
+    _loadOccurrenceCount(); // Call this when screen loads
+  }
+
+  Future<void> _loadOccurrenceCount() async {
+    final count =
+        await GBIFService.getOccurrenceCount(widget.plant.scientificName);
+    setState(() {
+      _occurrenceCount = count;
+      _isLoadingCount = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -26,23 +49,39 @@ class ResultScreen extends StatelessWidget {
           foregroundColor: Colors.white,
           // Add this button where you display the plant info
           actions: [
-            ElevatedButton.icon(
-              onPressed: () {
+            GestureDetector(
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => PlantMapScreen(
-                      plantName: plant.name,
-                      scientificName: plant.scientificName,
+                      plantName: widget.plant.name,
+                      scientificName: widget.plant.scientificName,
                     ),
                   ),
                 );
               },
-              icon: const Icon(Icons.map),
-              label: const Text('Voir la distribution mondiale'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.public, color: Colors.green, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      _isLoadingCount ? '...' : '$_occurrenceCount',
+                      style: TextStyle(
+                        color: Colors.green.shade700,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           ]),
@@ -54,7 +93,7 @@ class ResultScreen extends StatelessWidget {
               elevation: 4,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.file(photo,
+                child: Image.file(widget.photo,
                     height: 250, width: double.infinity, fit: BoxFit.cover),
               ),
             ),
@@ -74,15 +113,15 @@ class ResultScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                plant.name,
+                                widget.plant.name,
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              if (plant.scientificName.isNotEmpty)
+                              if (widget.plant.scientificName.isNotEmpty)
                                 Text(
-                                  plant.scientificName,
+                                  widget.plant.scientificName,
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontStyle: FontStyle.italic,
@@ -95,19 +134,20 @@ class ResultScreen extends StatelessWidget {
                       ],
                     ),
                     const Divider(height: 30),
-                    if (plant.family.isNotEmpty)
-                      _infoRow(Icons.category, 'Famille', plant.family),
-                    if (plant.localName != null)
-                      _infoRow(Icons.language, 'Nom local', plant.localName!),
+                    if (widget.plant.family.isNotEmpty)
+                      _infoRow(Icons.category, 'Famille', widget.plant.family),
+                    if (widget.plant.localName != null)
+                      _infoRow(
+                          Icons.language, 'Nom local', widget.plant.localName!),
                     _infoRow(
                       Icons.analytics,
                       'Confiance',
-                      '${(plant.confidence * 100).toStringAsFixed(1)}%',
+                      '${(widget.plant.confidence * 100).toStringAsFixed(1)}%',
                     ),
                     _infoRow(
                       Icons.fingerprint,
                       'ID',
-                      identificationId.substring(0, 8),
+                      widget.identificationId.substring(0, 8),
                     ),
                   ],
                 ),
