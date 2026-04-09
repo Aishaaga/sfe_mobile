@@ -34,8 +34,33 @@ class _PlantMapScreenState extends State<PlantMapScreen> {
       _isLoading = true;
       _error = '';
     });
-
     final result = await GBIFService.getOccurrences(widget.scientificName);
+
+    // Check if the error is a 503 (GBIF busy)
+    if (result['success'] == false &&
+        result['message']?.contains('503') == true) {
+      // Hide loading
+      setState(() => _isLoading = false);
+
+      // Show the friendly dialog
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Service temporairement indisponible'),
+          content: const Text(
+              'Le service de distribution de GBIF est actuellement surchargé.\n\n'
+              'Veuillez réessayer dans quelques minutes.\n\n'
+              'Les données de distribution seront disponibles ultérieurement.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
 
     if (result['success'] == true) {
       setState(() {
