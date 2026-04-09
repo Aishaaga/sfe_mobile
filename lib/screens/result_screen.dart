@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../models/plant.dart';
+import 'history_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final Plant plant;
@@ -108,7 +109,11 @@ class ResultScreen extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
-                      Navigator.pushReplacementNamed(context, '/history');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const HistoryScreen()),
+                      );
                     },
                     icon: const Icon(Icons.history),
                     label: const Text('Voir historique'),
