@@ -46,7 +46,7 @@ class _PlantMapScreenState extends State<PlantMapScreen> {
       });
     } else {
       setState(() {
-        _error = result['message'] ?? 'Erreur inconnue';
+        _error = result['message'] ?? 'Service temporairement indisponible';
         _isLoading = false;
       });
     }
