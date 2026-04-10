@@ -36,7 +36,9 @@ class _PlantMapScreenState extends State<PlantMapScreen> {
       _isLoading = true;
       _error = '';
     });
-    final result = await GBIFService.getOccurrences(widget.scientificName);
+
+    final result =
+        await GBIFService.getOccurrences(widget.scientificName, limit: 200);
 
     // Check if the error is a 503 (GBIF busy)
     if (result['success'] == false &&

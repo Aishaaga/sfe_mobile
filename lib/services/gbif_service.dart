@@ -7,10 +7,11 @@ class GBIFService {
   static const String baseUrl =
       'http://192.168.0.182:3000/api'; // Your backend URL
   static final _storage = FlutterSecureStorage();
+  int limit = 200;
 
   /// Get occurrences from YOUR backend (which calls GBIF)
-  static Future<Map<String, dynamic>> getOccurrences(
-      String scientificName) async {
+  static Future<Map<String, dynamic>> getOccurrences(String scientificName,
+      {required int limit}) async {
     final url = '$baseUrl/gbif/summary/${Uri.encodeComponent(scientificName)}';
     print('📡 Calling URL: $url'); // DEBUG
     try {
@@ -25,7 +26,7 @@ class GBIFService {
       // Call YOUR backend, not GBIF directly
       final response = await http.get(
         Uri.parse(
-            '$baseUrl/gbif/occurrences/${Uri.encodeComponent(scientificName)}?limit=100'),
+            '$baseUrl/gbif/occurrences/${Uri.encodeComponent(scientificName)}?limit=$limit'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
